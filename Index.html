@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Macha Empire Expansion & Decline</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+  <style>
+    body, html { margin: 0; padding: 0; height: 100%; }
+    #map { height: 100%; width: 100%; }
+    .legend {
+      background: white;
+      padding: 10px;
+      line-height: 1.5em;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    var map = L.map('map').setView([45, 10], 4);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: 'Map data © OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Locations with rise, peak, and decline
+    var events = [
+      {name: "Macha Founded (2700 BCE)", coords: [46.8, 8.3], type: "rise"},
+      {name: "Defeats Phyrana (1595 BCE)", coords: [46.0, 9.0], type: "rise"},
+      {name: "Iberian Expansion (1335 BCE)", coords: [40.0, -4.0], type: "rise"},
+      {name: "Eastern Conquests (1185-1175 BCE)", coords: [39.0, 35.0], type: "rise"},
+      {name: "Assyria & Armenia (1175 BCE)", coords: [36.0, 43.0], type: "rise"},
+      {name: "Conquers Germenia (1160 BCE)", coords: [50.0, 10.0], type: "rise"},
+      {name: "Peak Empire (335 BCE–110 CE)", coords: [50.0, 10.0], type: "peak", radius: 2000000 },
+      // Decline
+      {name: "Roman Conquest of Celtae (115 CE)", coords: [46.0, -3.0], type: "decline"},
+      {name: "Slavo-Celts Sack Macha (135 CE)", coords: [46.8, 8.3], type: "decline"},
+      {name: "Empire Split (140 CE)", coords: [48.0, 10.0], type: "decline"},
+      {name: "Fall of Western Macha (450 CE)", coords: [46.0, 10.0], type: "decline"},
+      {name: "Theocracy & Byzantine Rule (450–700 CE)", coords: [40.0, 20.0], type: "decline"}
+    ];
+
+    events.forEach(ev => {
+      if(ev.type === "rise"){
+        L.marker(ev.coords, {title: ev.name}).addTo(map).bindPopup(ev.name);
+      } else if(ev.type === "peak"){
+        L.circle(ev.coords, {
+          color: 'gold',
+          fillColor: '#ffcc00',
+          fillOpacity: 0.3,
+          radius: ev.radius
+        }).addTo(map).bindPopup(ev.name);
+      } else if(ev.type === "decline"){
+        L.circle(ev.coords, {
+          color: 'red',
+          fillColor: '#ff4444',
+          fillOpacity: 0.4,
+          radius: 500000
+        }).addTo(map).bindPopup(ev.name);
+      }
+    });
+
+    // Draw lines showing expansion
+    for(let i = 0; i < events.length-1; i++){
+      L.polyline([events[i].coords, events[i+1].coords], {color: 'orange'}).addTo(map);
+    }
+
+    // Legend
+    var legend = L.control({position: 'bottomright'});
+    legend.onAdd = function(map){
+      var div = L.DomUtil.create('div', 'legend');
+      div.innerHTML = "<b>Macha Empire Timeline</b><br>" +
+                      "<span style='color:orange;'>●</span> Expansion/Events<br>" +
+                      "<span style='color:gold;'>●</span> Peak Empire<br>" +
+                      "<span style='color:red;'>●</span> Decline/Collapse";
+      return div;
+    };
+    legend.addTo(map);
+  </script>
+</body>
+</html>
